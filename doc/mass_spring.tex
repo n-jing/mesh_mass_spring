@@ -1,0 +1,45 @@
+\documentclass{article}
+
+\usepackage{subfigure}
+\usepackage{graphicx}             %添加图片
+\graphicspath{{./figs/}{./draw/}{./screen/}}
+\usepackage{bm}                   %专门处理数学粗体的bm宏包,使用命令是\bm{}
+
+
+\input{structure_report.tex} % Include the file specifying the document structure and custom commands
+
+%----------------------------------------------------------------------------------------
+%	ASSIGNMENT INFORMATION
+%----------------------------------------------------------------------------------------
+
+\title{Mass Spring} % Title of the assignment
+
+\author{Jing JIANG\\ \texttt{siliuhe@sina.com}} % Author name and email address
+
+\date{%% State Key Lab of CAD\&CG,Zhejiang University --- 
+  \today} % University, school and/or department name(s) and a date
+
+%----------------------------------------------------------------------------------------
+
+\begin{document}
+
+\maketitle % Print the title
+
+%----------------------------------------------------------------------------------------
+%	INTRODUCTION
+%----------------------------------------------------------------------------------------
+
+\section*{Introduction} % Unnumbered section
+
+According to Hooke's law, $\bm{f} = -k\bm{x}$.
+$$\sum_i^n{\sum_{k=0}^{m}{k_{ik}(\bm{v}_i-\bm{v}_k)}=0}$$
+where $n$ is the number of mesh point, $m$ is the number of neighbor point of $\bm{v}_i$.
+\section*{Implement}
+\begin{enumerate}
+\item read mesh
+\item set mass spring parameter
+\item set static equilibrium equation
+\item solve
+\end{enumerate}
+\section*{Result}
+\end{document}
