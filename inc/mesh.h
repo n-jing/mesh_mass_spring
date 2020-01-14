@@ -23,21 +23,32 @@ public:
     std::pair<size_t, size_t> e;
     double k;
   };
-
+  static void set_gravity(double g);
+  static double get_gravity();
+  static void set_displacement(double d);
+  static double get_displacement();
 public:
-  size_t add_vert(const Eigen::Vector3d &v, double w);
-  size_t add_edge(const std::pair<size_t, size_t> &e, double k);
-  size_t add_edge(size_t v1, size_t v2, double k);
-  const std::pair<size_t, size_t> &get_edge(size_t idx) const;
+  size_t get_vert_num() const;
+  size_t get_edge_num() const;
+public:
+  inline size_t add_vert(const Eigen::Vector3d &v, double w = 0);
+  inline size_t add_edge(const std::pair<size_t, size_t> &e, double k = 0);
+  inline size_t add_edge(size_t v1, size_t v2, double k = 0);
+  inline const std::pair<size_t, size_t> &get_edge(size_t idx) const;
   double get_edge_weight(size_t idx) const;
   const Eigen::Vector3d &get_vert_coord(size_t idx) const;
   double get_vert_weight(size_t idx) const;
   const std::vector<size_t> &get_neighbor_vert(size_t idx) const;
+
+  void set_vert_weight(size_t idx, double w);
+  void set_edge_stiffness(size_t idx, double k);
   
 private:
   std::vector<Vert> vert_; // vert
   std::vector<Edge> edge_;
   std::unordered_map<size_t, std::vector<size_t>> neigh_vert_;
+  static double g_; // gravity
+  static double d_; // default displacement
 };
 
 
