@@ -31,8 +31,14 @@
 
 \section*{Introduction} % Unnumbered section
 
-According to Hooke's law, $\bm{f} = -k\bm{x}$.
-$$\sum_i^n{\sum_{k=0}^{m}{k_{ik}(\bm{v}_i-\bm{v}_k)}=0}$$
+According to Hooke's law, $\bm{f} = -k\bm{x}$, $E=\frac{1}{2}k{||\bm{x}||}^2$.
+\begin{equation*}
+  \begin{split}
+    E&=E_g+E_k  \\
+    E_g&=\sum_{i=0}^{n}m_i\bm{g}_i  \\
+    E_k&=\sum_{e=0}^{m}\frac{1}{2}k_e({||\bm{v}_j-\bm{v}_i||-l_e})^2
+  \end{split}
+\end{equation*}
 where $n$ is the number of mesh point, $m$ is the number of neighbor point of $\bm{v}_i$.
 \section*{Implement}
 \begin{enumerate}

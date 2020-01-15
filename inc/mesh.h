@@ -27,9 +27,11 @@ public:
   static double get_gravity();
   static void set_displacement(double d);
   static double get_displacement();
+
 public:
   size_t get_vert_num() const;
   size_t get_edge_num() const;
+
 public:
   inline size_t add_vert(const Eigen::Vector3d &v, double w = 0);
   inline size_t add_edge(const std::pair<size_t, size_t> &e, double k = 0);

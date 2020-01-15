@@ -18,5 +18,6 @@ int main (int argc, char *argv[])
   readOBJ("mesh.obj", V, F);
 
   EdgeMesh edge_mesh(V, F);
+  
   return 0;
 }
