@@ -7,10 +7,17 @@ using namespace std;
 using namespace Eigen;
 
 
+EdgeMesh edge_mesh;
+
 double EdgeMesh::g_ = 9.8;
 double EdgeMesh::d_ = 0.1;
 
 EdgeMesh::EdgeMesh(const Eigen::MatrixXd &V, const Eigen::MatrixXi &F)
+{
+  init(V, F);
+}
+
+int EdgeMesh::init(const Eigen::MatrixXd &V, const Eigen::MatrixXi &F)
 {
   const size_t vert_num = V.rows();
   const size_t face_num = F.rows();
@@ -24,9 +31,9 @@ EdgeMesh::EdgeMesh(const Eigen::MatrixXd &V, const Eigen::MatrixXi &F)
   {
     for (size_t j = 0; j < face_vert; ++j)
     {
-      pair<size_t, size_t> e = {F(i, j), F(i, (j+1)%face_vert)};
+      array<size_t, 2> e = {F(i, j), F(i, (j+1)%face_vert)};
       add_edge(e);
-      min_e = min((vert_.at(e.first).v - vert_.at(e.second).v).norm(), min_e);
+      min_e = min((vert_.at(e[0]).v - vert_.at(e[1]).v).norm(), min_e);
     }
   }
   default_random_engine e;
@@ -42,6 +49,7 @@ EdgeMesh::EdgeMesh(const Eigen::MatrixXd &V, const Eigen::MatrixXi &F)
     // where d is the coefficient
     set_edge_stiffness(i, g_ * u(e) / min_e / d_); 
   }
+  return 0;
 }
 
 void EdgeMesh::set_gravity(double g)
@@ -86,10 +94,10 @@ size_t EdgeMesh::add_vert(const Eigen::Vector3d &v, double w)
   return vert.id;
 }
 
-size_t EdgeMesh::add_edge(const std::pair<size_t, size_t> &e, double k)
+size_t EdgeMesh::add_edge(const std::array<size_t, 2> &e, double k)
 {
-  neigh_vert_[e.first].push_back(e.second);
-  neigh_vert_[e.second].push_back(e.first);
+  neigh_vert_[e[0]].push_back(e[1]);
+  neigh_vert_[e[1]].push_back(e[0]);
   
   EdgeMesh::Edge edge(e, k);
   edge.id = edge_.size();
@@ -110,10 +118,19 @@ size_t EdgeMesh::add_edge(size_t v1, size_t v2, double k)
   return edge.id;
 }
 
-const std::pair<size_t, size_t> &EdgeMesh::get_edge(size_t idx) const
+const std::array<size_t, 2> &EdgeMesh::get_edge(size_t idx) const
 {
   return edge_.at(idx).e;
 }
+
+double EdgeMesh::get_edge_length(size_t idx) const
+{
+  array<size_t, 2> endpoint = edge_.at(idx).e;
+  const Vector3d &v1 = vert_[endpoint[0]].v;
+  const Vector3d &v2 = vert_[endpoint[1]].v;
+  return (v1 - v2).norm();
+}
+
 
 double EdgeMesh::get_edge_weight(size_t idx) const
 {

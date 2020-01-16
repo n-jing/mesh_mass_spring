@@ -4,11 +4,12 @@
 #include <vector>
 #include <Eigen/Core>
 #include <unordered_map>
-
+#include <array>
 class EdgeMesh
 {
 public:
   EdgeMesh(const Eigen::MatrixXd &V, const Eigen::MatrixXi &F);
+  EdgeMesh() { }
   struct Vert
   {
     Vert(const Eigen::Vector3d &vert, double weight) : v(vert), w(weight) { }
@@ -18,9 +19,9 @@ public:
   };
   struct Edge
   {
-    Edge(const std::pair<size_t, size_t> &edge, double ki) : e(edge), k(ki) { }
+    Edge(const std::array<size_t, 2> &edge, double ki) : e(edge), k(ki) { }
     size_t id;
-    std::pair<size_t, size_t> e;
+    std::array<size_t, 2> e;
     double k;
   };
   static void set_gravity(double g);
@@ -31,12 +32,14 @@ public:
 public:
   size_t get_vert_num() const;
   size_t get_edge_num() const;
+  int init(const Eigen::MatrixXd &V, const Eigen::MatrixXi &F);
 
 public:
-  inline size_t add_vert(const Eigen::Vector3d &v, double w = 0);
-  inline size_t add_edge(const std::pair<size_t, size_t> &e, double k = 0);
-  inline size_t add_edge(size_t v1, size_t v2, double k = 0);
-  inline const std::pair<size_t, size_t> &get_edge(size_t idx) const;
+  size_t add_vert(const Eigen::Vector3d &v, double w = 0);
+  size_t add_edge(const std::array<size_t, 2> &e, double k = 0);
+  size_t add_edge(size_t v1, size_t v2, double k = 0);
+  const std::array<size_t, 2> &get_edge(size_t idx) const;
+  double get_edge_length(size_t idx) const;
   double get_edge_weight(size_t idx) const;
   const Eigen::Vector3d &get_vert_coord(size_t idx) const;
   double get_vert_weight(size_t idx) const;
@@ -52,6 +55,5 @@ private:
   static double g_; // gravity
   static double d_; // default displacement
 };
-
 
 #endif // MESHH_JJ_H
