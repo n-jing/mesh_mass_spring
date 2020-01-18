@@ -9,8 +9,14 @@ using namespace Eigen;
 
 EdgeMesh edge_mesh;
 
-double EdgeMesh::g_ = 9.8;
 double EdgeMesh::d_ = 0.1;
+Vector3d EdgeMesh::gravity_(0, -9.8, 0);
+
+Eigen::Vector3d &EdgeMesh::get_gravity()
+{
+  return gravity_;
+}
+
 
 EdgeMesh::EdgeMesh(const Eigen::MatrixXd &V, const Eigen::MatrixXi &F)
 {
@@ -40,28 +46,23 @@ int EdgeMesh::init(const Eigen::MatrixXd &V, const Eigen::MatrixXi &F)
   uniform_real_distribution<double> u(1, 2);
   for (size_t i = 0; i < vert_num; ++i)
   {
-    set_vert_weight(i, u(e));
+    // set_vert_weight(i, u(e));
+    set_vert_weight(i, 1);
   }
   const size_t edge_num = edge_.size();
   for (size_t i = 0; i < edge_num; ++i)
   {
     // m * g = k * delta x = k * d * x
     // where d is the coefficient
-    set_edge_stiffness(i, g_ * u(e) / min_e / d_); 
+    set_edge_stiffness(i, gravity_.norm() * u(e) / min_e / d_); 
   }
   return 0;
 }
 
-void EdgeMesh::set_gravity(double g)
+void EdgeMesh::set_gravity(const Eigen::Vector3d &g)
 {
-  g_ = g;
+  gravity_ = g;
 }
-
-double EdgeMesh::get_gravity()
-{
-  return g_;
-}
-
 
 size_t EdgeMesh::get_vert_num() const
 {

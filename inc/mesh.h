@@ -24,11 +24,12 @@ public:
     std::array<size_t, 2> e;
     double k;
   };
-  static void set_gravity(double g);
-  static double get_gravity();
+  static void set_gravity(const Eigen::Vector3d &g);
+  static Eigen::Vector3d &get_gravity();
+
   static void set_displacement(double d);
   static double get_displacement();
-
+  int fixed_vert;
 public:
   size_t get_vert_num() const;
   size_t get_edge_num() const;
@@ -52,8 +53,8 @@ private:
   std::vector<Vert> vert_; // vert
   std::vector<Edge> edge_;
   std::unordered_map<size_t, std::vector<size_t>> neigh_vert_;
-  static double g_; // gravity
   static double d_; // default displacement
+  static Eigen::Vector3d gravity_;  // gravity
 };
 
 #endif // MESHH_JJ_H

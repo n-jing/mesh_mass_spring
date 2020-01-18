@@ -1,6 +1,11 @@
 #ifndef SOLVER_JJ_H
 #define SOLVER_JJ_H
 
+
+#include <array>
+#include <Eigen/Core>
+
+
 class EdgeMesh;
 
 
@@ -17,7 +22,7 @@ double get_edge_length(const double* x, int vj, int vi);
 
 void new_iteration(int iter, int call_iter, double *x, double* f, double *g,  double* gnorm);
 
-int test();
+std::array<Eigen::Vector3d, 2> get_edge_vert(const double* x, int vj, int vi);
 
 
 #endif // SOLVER_JJ_H
