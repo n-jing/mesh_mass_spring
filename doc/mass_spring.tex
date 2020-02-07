@@ -35,7 +35,7 @@ According to Hooke's law, $\bm{f} = -k\bm{x}$, $E=\frac{1}{2}k{||\bm{x}||}^2$.
 \begin{equation*}
   \begin{split}
     E&=E_g+E_k  \\
-    E_g&=\sum_{i=0}^{n}m_i\bm{g}_i  \\
+    E_g&=\sum_{i=0}^{n}m_i\bm{g}  \\
     E_k&=\sum_{e=0}^{m}\frac{1}{2}k_e({||\bm{v}_j-\bm{v}_i||-l_e})^2
   \end{split}
 \end{equation*}
@@ -101,5 +101,18 @@ where $n$ is the number of mesh point, $m$ is the number of neighbor point of $\
   \centering
   \caption{bar}
 \end{figure}
+
+\section*{Dynamic}
+\subsection*{Explicit Euler}
+\begin{equation*}
+  \begin{aligned}
+    \bm{X}_{n+1} &= \bm{X}_n + \bm{V}_n\Delta t \\
+    \bm{V}_{n+1} &= \bm{V}_n + \bm{M}_n^{-1}\bm{F}_n\Delta t \\
+    \bm{f}_i &= m_i\bm{g} + \sum_e{-\delta_{ip}\cdot k_e(||\bm{x}_p-\bm{x}_q|| - l_e)\cdot \frac{\bm{x}_p-\bm{x}_q}{||\bm{x}_p-\bm{x}_q||}} + \sum_e{\delta_{iq}\cdot k_e(||\bm{x}_p-\bm{x}_q|| - l_e)\cdot \frac{\bm{x}_p-\bm{x}_q}{||\bm{x}_p-\bm{x}_q||}} \\
+    &= m_i\bm{g} + \sum_e{-\delta_{ip}\cdot k_e(1 - \frac{l_e}{||\bm{x}_p-\bm{x}_q||})(\bm{x}_p-\bm{x}_q)} + \sum_e{\delta_{iq}\cdot k_e(1 - \frac{l_e}{||\bm{x}_p-\bm{x}_q||})(\bm{x}_p-\bm{x}_q)}
+  \end{aligned}
+\end{equation*}
+
+\subsection*{Result}
 
 \end{document}

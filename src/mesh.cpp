@@ -42,8 +42,8 @@ int EdgeMesh::init(const Eigen::MatrixXd &V, const Eigen::MatrixXi &F)
       min_e = min((vert_.at(e[0]).v - vert_.at(e[1]).v).norm(), min_e);
     }
   }
-  default_random_engine e;
-  uniform_real_distribution<double> u(1, 2);
+  // default_random_engine e;
+  // uniform_real_distribution<double> u(1, 2);
   for (size_t i = 0; i < vert_num; ++i)
   {
     // set_vert_weight(i, u(e));
@@ -54,7 +54,8 @@ int EdgeMesh::init(const Eigen::MatrixXd &V, const Eigen::MatrixXi &F)
   {
     // m * g = k * delta x = k * d * x
     // where d is the coefficient
-    set_edge_stiffness(i, gravity_.norm() * u(e) / min_e / d_); 
+    // set_edge_stiffness(i, gravity_.norm() * u(e) / min_e / d_); 
+    set_edge_stiffness(i, gravity_.norm() / min_e / d_); 
   }
   return 0;
 }
