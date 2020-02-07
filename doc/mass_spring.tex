@@ -28,8 +28,8 @@
 %----------------------------------------------------------------------------------------
 %	INTRODUCTION
 %----------------------------------------------------------------------------------------
-
-\section*{Introduction} % Unnumbered section
+\section*{Static Equilibrium}
+\subsection*{Introduction} % Unnumbered section
 
 According to Hooke's law, $\bm{f} = -k\bm{x}$, $E=\frac{1}{2}k{||\bm{x}||}^2$.
 \begin{equation*}
@@ -40,12 +40,66 @@ According to Hooke's law, $\bm{f} = -k\bm{x}$, $E=\frac{1}{2}k{||\bm{x}||}^2$.
   \end{split}
 \end{equation*}
 where $n$ is the number of mesh point, $m$ is the number of neighbor point of $\bm{v}_i$.
-\section*{Implement}
+\subsection*{Implement}
 \begin{enumerate}
 \item read mesh
 \item set mass spring parameter
 \item set static equilibrium equation
 \item solve
 \end{enumerate}
-\section*{Result}
+\subsection*{Result}
+\begin{figure}[htbp]
+  \centering
+  \subfigure[origin]{
+    \begin{minipage}[t]{0.32\linewidth}
+      \centering
+      \includegraphics[width=3.2cm]{cube}
+      % \caption{fig1}
+    \end{minipage}%
+  }%
+  \subfigure[iteration]{
+    \begin{minipage}[t]{0.32\linewidth}
+      \centering
+      \includegraphics[width=3.2cm]{t_cube}
+      % \caption{fig2}
+    \end{minipage}%
+  }%
+  \subfigure[balance]{
+    \begin{minipage}[t]{0.32\linewidth}
+      \centering
+      \includegraphics[width=3.2cm]{m_cube}
+      % \caption{fig2}
+    \end{minipage}%
+  }%
+  \centering
+  \caption{model: cube}
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  \subfigure[origin]{
+    \begin{minipage}[t]{0.32\linewidth}
+      \centering
+      \includegraphics[width=3.2cm]{sphere}
+      % \caption{fig1}
+    \end{minipage}%
+  }%
+  \subfigure[iteration]{
+    \begin{minipage}[t]{0.32\linewidth}
+      \centering
+      \includegraphics[width=3.2cm]{t_sphere}
+      % \caption{fig2}
+    \end{minipage}%
+  }%
+  \subfigure[balance]{
+    \begin{minipage}[t]{0.32\linewidth}
+      \centering
+      \includegraphics[width=0.7cm]{m_sphere}
+      % \caption{fig2}
+    \end{minipage}%
+  }%
+  \centering
+  \caption{bar}
+\end{figure}
+
 \end{document}
