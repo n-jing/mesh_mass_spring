@@ -59,7 +59,7 @@ int main (int argc, char *argv[])
   vector<double> init_edge_vert = get_vert(var, edge_mesh);
   write_mesh_to_vtk(&init_edge_vert[0], edge_mesh, "init_state.vtk");
   
-  Integral integral = Integral::explicit_euler;
+  Integral integral = Integral::speed_implicit;
   time_integral(var, speed, time, delta_t, integral);
   
   vector<double> balance_edge_vert = get_vert(var, edge_mesh);

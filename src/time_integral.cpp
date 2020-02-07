@@ -58,47 +58,111 @@ void calc_force(const double *const var, double *g)
 
 void time_integral(double *const location, double *const speed, double time, double delta_t, Integral integral)
 {
-  const int vert_num = edge_mesh.get_vert_num();
   const int var_num = edge_mesh.get_vert_num() - 1;
   double force[3*var_num];
-  const int fixed_vert = edge_mesh.fixed_vert;
-
   int count = 0;
   for (double t = 0; t < time; t += delta_t)
   {
     cerr << "t:" << t << endl;
-    calc_force(location, force);
-    for (int i = 0; i < vert_num; ++i)
+    if (integral == Integral::explicit_euler)
     {
-      if (i == fixed_vert)
-        continue;
-      double weight = edge_mesh.get_vert_weight(i);
-      int var_id = i > fixed_vert ? i - 1 : i;
-      for (int a = 0; a < 3; ++a)
-      {
-        if (integral == Integral::explicit_euler)
-        {
-          double acceleration = 1.0 / weight * force[3*var_id + a];
-          speed[3*var_id + a] += acceleration * delta_t;
-          location[3*var_id + a] += speed[3*var_id + a] * delta_t;
-        }
-        else if (integral == Integral::implicit_euler)
-        {
-          
-        }
-        else
-        {
-          cerr << "error in integral method" << endl;
-          return ;
-        }
-      }
+      explicit_integral(location, speed, force, delta_t);
     }
+    else if (integral == Integral::implicit_euler)
+    {
+      implicit_integral(location, speed, force, delta_t);
+    }
+    else if (integral == Integral::location_implicit)
+    {
+      location_semi_implicit_integral(location, speed, force, delta_t);
+    }
+    else
+    {
+      speed_semi_implicit_integral(location, speed, force, delta_t);
+    }
+    
     ++count;
-    if (count % 1000 == 0)
+    if (count % 100 == 0)
     {
       string out = "state_" + to_string(count) + ".vtk";
       vector<double> vert = get_vert(location, edge_mesh);
       write_mesh_to_vtk(&vert[0], edge_mesh, out.c_str());
     }
   }
+}
+
+void explicit_integral(double *const location, double *const speed, double *const force, double delta_t)
+{
+  const int vert_num = edge_mesh.get_vert_num();
+  const int fixed_vert = edge_mesh.fixed_vert;
+
+  calc_force(location, force);
+  for (int i = 0; i < vert_num; ++i)
+  {
+    if (i == fixed_vert)
+      continue;
+    double weight = edge_mesh.get_vert_weight(i);
+    int var_id = i > fixed_vert ? i - 1 : i;
+    for (int a = 0; a < 3; ++a)
+    {
+      location[3*var_id + a] += speed[3*var_id + a] * delta_t;
+      double acceleration = 1.0 / weight * force[3*var_id + a];
+      speed[3*var_id + a] += acceleration * delta_t;
+    }
+  }
+}
+
+void location_semi_implicit_integral(double *const location, double *const speed, double *const force, double delta_t)
+{
+  const int vert_num = edge_mesh.get_vert_num();
+  const int fixed_vert = edge_mesh.fixed_vert;
+
+  calc_force(location, force);
+  for (int i = 0; i < vert_num; ++i)
+  {
+    if (i == fixed_vert)
+      continue;
+    double weight = edge_mesh.get_vert_weight(i);
+    int var_id = i > fixed_vert ? i - 1 : i;
+    for (int a = 0; a < 3; ++a)
+    {
+      double acceleration = 1.0 / weight * force[3*var_id + a];
+      speed[3*var_id + a] += acceleration * delta_t;
+      location[3*var_id + a] += speed[3*var_id + a] * delta_t;
+    }
+  }
+}
+
+void speed_semi_implicit_integral(double *const location, double *const speed, double *const force, double delta_t)
+{
+  const int vert_num = edge_mesh.get_vert_num();
+  const int fixed_vert = edge_mesh.fixed_vert;
+
+  for (int i = 0; i < vert_num; ++i)
+  {
+    if (i == fixed_vert)
+      continue;
+    int var_id = i > fixed_vert ? i - 1 : i;
+    for (int a = 0; a < 3; ++a)
+      location[3*var_id + a] += speed[3*var_id + a] * delta_t;
+  }
+
+  calc_force(location, force);
+  for (int i = 0; i < vert_num; ++i)
+  {
+    if (i == fixed_vert)
+      continue;
+    double weight = edge_mesh.get_vert_weight(i);
+    int var_id = i > fixed_vert ? i - 1 : i;
+    for (int a = 0; a < 3; ++a)
+    {
+      double acceleration = 1.0 / weight * force[3*var_id + a];
+      speed[3*var_id + a] += acceleration * delta_t;
+    }
+  }
+}
+
+void implicit_integral(double *const location, double *const speed, double *const force, double delta_t)
+{
+  
 }
