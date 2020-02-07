@@ -27,7 +27,7 @@ int main (int argc, char *argv[])
   cerr << edge_mesh.get_vert_num() << " " << edge_mesh.get_edge_num() << endl;
 
   const int max_iterator_num = 10000;
-  const int bfgs_update_num = 7;
+  const int bfgs_update_num = 10;
   const int hessinae_update_interval = 0;
   const bool with_hessian = false;
   const int vert_num = edge_mesh.get_vert_num();

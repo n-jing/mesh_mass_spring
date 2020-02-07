@@ -35,7 +35,8 @@ int construct_solver(
   info[6] = hessinae_update_interval; // the update interval of Hessian. (typical choices: 0-200)
   info[7] = with_hessian ? 1 : 0;
 
-  parameter[6] = 1.0e-6;
+  parameter[5] = 1.0e-6; // stop criterion on relative error ||g|| /max(1, ||x||)
+  // parameter[6] = 1.0e-6; // stop criterion on absolute error ||g||
   if (with_hessian)
   {
     cerr << "hessian is not supported" << endl;
