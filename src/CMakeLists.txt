@@ -3,6 +3,9 @@ LIST(APPEND CMAKE_MODULE_PATH /home/jing/Workspace/Project/libigl/cmake)
 
 INCLUDE(libigl)
 
+# ADD_DEFINITIONS(-DRANDOM) #random vert weight and random k
+# ADD_DEFINITIONS(-DRIGID)  #rigid mesh
+
 SET(src_mesh
   solver.cpp
   writer.cpp

@@ -113,6 +113,18 @@ where $n$ is the number of mesh point, $m$ is the number of neighbor point of $\
   \end{aligned}
 \end{equation*}
 
+\subsection*{Implicit Euler}
+\begin{equation*}
+  \begin{aligned}
+    \bm{X}_{n+1} &= \bm{X}_n + \bm{V}_{n+1}\Delta t \\
+    \bm{V}_{n+1} &= \bm{V}_n + \bm{M}_n^{-1}\bm{F}_{n+1}\Delta t \\
+    \bm{F}_{n+1} &= \bm{H}\bm{X}_{n+1} \\
+    \Rightarrow \bm{V}_{n+1} &= \bm{V}_{n} + \bm{M}_n^{-1}\bm{H}\bm{X}_{n+1}\Delta t \\
+    &= \bm{V}_{n} + \bm{M}_{n}^{-1}\bm{H}(\bm{X}_n + \bm{V}_{n+1}\Delta t)\Delta t \\
+    (1+\bm{M}_{n}^{-1}\bm{H}\Delta t^2)\bm{V}_{n+1} &= \bm{V}_{n} + \bm{M}_{n}^{-1}\bm{H}\bm{X}_n\Delta t
+  \end{aligned}
+\end{equation*}
+
 \subsection*{Result}
 
 \end{document}

@@ -34,13 +34,14 @@ int main (int argc, char *argv[])
   const int var_num = 3 * (vert_num - 1);
 
   
-  random_device rd;
-  mt19937 gen(rd());
   default_random_engine e;
   uniform_real_distribution<double> u(0, 0.1);
+
+  random_device rd;
+  mt19937 gen(rd());
   uniform_int_distribution<int> vert_u(0, vert_num-1);
 
-  const int fixed_vert = 0;
+  const int fixed_vert = vert_u(gen);
   edge_mesh.fixed_vert = fixed_vert;
   double var[var_num];
   for (int i = 0; i < vert_num; ++i)
