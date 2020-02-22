@@ -8,29 +8,20 @@
 using namespace std;
 using namespace Eigen;
 
-std::vector<double> get_vert(double *var, const EdgeMesh& edge_mesh)
+void get_vert(double *var, double *vert, EdgeMesh *edge_mesh)
 {
-  const int fixed_vert = edge_mesh.fixed_vert;
-  const int vert_num = edge_mesh.get_vert_num();
-  vector<double> vert(3 * vert_num);
-  for (int i = 0; i < vert_num; ++i)
+  int i = threadIdx.x + blockIdx.x * blockDim.x;
+  if (i == edge_mesh->fixed_vert)
   {
-    if (i == fixed_vert)
-    {
-      const Vector3d &v = edge_mesh.get_vert_coord(i);
-      for (int a = 0; a < 3; ++a)
-        vert[3*i + a] = v[a];
-      continue;
-    } 
-    int var_id = i > fixed_vert ? i - 1 : i;
+    const Vector3d &v = edge_mesh->get_vert_coord(i);
     for (int a = 0; a < 3; ++a)
-      vert[3*i + a] = var[3*var_id + a];
-  }
-
-  return vert;
+      vert[3*i + a] = v[a];
+    return ;
+  } 
+  int var_id = i > fixed_vert ? i - 1 : i;
+  for (int a = 0; a < 3; ++a)
+    vert[3*i + a] = var[3*var_id + a];
 }
-
-
 
 int write_mesh_to_vtk(double *var, const EdgeMesh &edge_mesh, const char *path)
 {

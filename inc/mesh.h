@@ -5,6 +5,7 @@
 #include <Eigen/Core>
 #include <unordered_map>
 #include <array>
+
 class EdgeMesh
 {
 public:
@@ -12,7 +13,11 @@ public:
   EdgeMesh() { }
   struct Vert
   {
-    Vert(const Eigen::Vector3d &vert, double weight) : v(vert), w(weight) { }
+    Vert(const double *const vert, double weight)
+      {
+        v[0] = vert[0]; v[1] = vert[1]; v[2] = vert[2];
+        w = weight;
+      }
     size_t id;
     Eigen::Vector3d v;
     double w;
@@ -34,25 +39,25 @@ public:
   size_t get_vert_num() const;
   size_t get_edge_num() const;
   int init(const Eigen::MatrixXd &V, const Eigen::MatrixXi &F);
+  int init(const double *const V, int v_row, int v_col,
+           const double *const F, int f_row, int f_col);
 
 public:
-  size_t add_vert(const Eigen::Vector3d &v, double w = 0);
-  size_t add_edge(const std::array<size_t, 2> &e, double k = 0);
-  size_t add_edge(size_t v1, size_t v2, double k = 0);
+  size_t add_vert(const double *const v, int v_id = 0, double w = 0);
+  void add_edge(const std::array<size_t, 2> &e, int e_id = 0, double k = 0);
   const std::array<size_t, 2> &get_edge(size_t idx) const;
   double get_edge_length(size_t idx) const;
   double get_edge_weight(size_t idx) const;
   const Eigen::Vector3d &get_vert_coord(size_t idx) const;
   double get_vert_weight(size_t idx) const;
-  const std::vector<size_t> &get_neighbor_vert(size_t idx) const;
 
   void set_vert_weight(size_t idx, double w);
   void set_edge_stiffness(size_t idx, double k);
   
-private:
-  std::vector<Vert> vert_; // vert
-  std::vector<Edge> edge_;
-  std::unordered_map<size_t, std::vector<size_t>> neigh_vert_;
+// private:
+public:
+  Vert *vert_; // vert
+  Edge *edge_;
   static double d_; // default displacement
   static Eigen::Vector3d gravity_;  // gravity
 };

@@ -1,7 +1,15 @@
+FIND_PACKAGE(CUDA REQUIRED)
 FIND_PACKAGE(Eigen3 REQUIRED)
 LIST(APPEND CMAKE_MODULE_PATH /home/jing/Workspace/Project/libigl/cmake)
 
 INCLUDE(libigl)
+
+ENABLE_LANGUAGE(CUDA)
+SET(CUDA_SEPARABLE_COMPILATION ON)
+SET(CUDA_PROPAGATE_HOST_FLAGS OFF)
+IF (CMAKE_SIZEOF_VOID_P MATCHES 8)
+  SET(CUDA_64_BIT_DEVICE_CODE_DEFAULT ON)
+ENDIF()
 
 # ADD_DEFINITIONS(-DRANDOM) #random vert weight and random k
 # ADD_DEFINITIONS(-DRIGID)  #rigid mesh
@@ -10,16 +18,17 @@ SET(src_mesh
   solver.cpp
   writer.cpp
   mesh.cpp
-  time_integral.cpp
+  time_integral.cu
   remove_duplicate_vert.cpp)
-ADD_LIBRARY(mesh ${src_mesh})
-TARGET_INCLUDE_DIRECTORIES(mesh PUBLIC ${CMAKE_SOURCE_DIR}/inc)
-TARGET_LINK_LIBRARIES(mesh PUBLIC Eigen3::Eigen igl::core bfgs)
+CUDA_ADD_LIBRARY(mesh ${src_mesh})
+TARGET_INCLUDE_DIRECTORIES(mesh PUBLIC ${CMAKE_SOURCE_DIR}/inc ${CUDA_INCLUDE_DIRS})
+TARGET_LINK_LIBRARIES(mesh PUBLIC Eigen3::Eigen igl::core bfgs ${CUDA_LIBS})
+
 
 ADD_EXECUTABLE(balance balance.cpp)
 TARGET_LINK_LIBRARIES(balance mesh)
 
-ADD_EXECUTABLE(dynamic dynamic.cpp)
+CUDA_ADD_EXECUTABLE(dynamic dynamic.cu)
 TARGET_LINK_LIBRARIES(dynamic mesh)
 
 SET(EXECUTABLE_OUTPUT_PATH "../bin")
