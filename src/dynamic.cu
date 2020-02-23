@@ -42,12 +42,11 @@ int main (int argc, char *argv[])
     f[i] = F(i);
 
   edge_mesh->init(v, V.rows(), V.cols(), f, F.rows(), F.cols());
-  cerr << edge_mesh->get_vert_num() << " " << edge_mesh->get_edge_num() << endl;
 
   const int vert_num = edge_mesh->get_vert_num();
   const int var_num = 3 * (vert_num - 1);
-  const double time = 4;
-  const double delta_t = 1e-4;
+  const double time = 10;
+  const double delta_t = 1e-3;
   
   random_device rd;
   mt19937 gen(rd());

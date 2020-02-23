@@ -2,6 +2,7 @@
 #include "mesh.h"
 #include "writer.h"
 #include "solver.h"
+#include "process_bar.h"
 #include <iostream>
 #include <vector>
 #include <Eigen/Core>
@@ -63,6 +64,7 @@ void time_integral(double *const location, double *const speed, double time, dou
   int count = 0;
   for (double t = 0; t < time; t += delta_t)
   {
+    show_progress_bar(cout, t / time * 100, "processing");
     movement_integral(location, speed, force, delta_t, integral, edge_mesh);
 
     ++count;
