@@ -23,7 +23,7 @@ void calc_force(const double *const var, double *g, const EdgeMesh *const edge_m
   {
     array<size_t, 2> endpoint = edge_mesh->get_edge(e);
     double k_e = edge_mesh->get_edge_weight(e);
-    array<Vector3d, 2> edge_vert = get_edge_vert(var, endpoint[1], endpoint[0]);
+    array<Vector3d, 2> edge_vert = get_edge_vert(var, endpoint[1], endpoint[0], edge_mesh);
     double new_length = (edge_vert[1] - edge_vert[0]).norm();
     double origin_length = edge_mesh->get_edge_length(e);
 
@@ -44,16 +44,16 @@ void calc_force(const double *const var, double *g, const EdgeMesh *const edge_m
 
 }
 
-__global__ void init_force(double *g, EdgeMesh *const edge_mesh)
+__global__ void init_force(double *g, const EdgeMesh *const edge_mesh)
 {
   int vert_id = threadIdx.x + blockIdx.x * blockDim.x;
   
-  if (vert_id == fixed_vert)
+  if (vert_id == edge_mesh->fixed_vert)
     return ;
   double weight = edge_mesh->get_vert_weight(vert_id);
   int var_id = vert_id > edge_mesh->fixed_vert ? vert_id - 1 : vert_id;
   for (int a = 0; a < 3; ++a)
-    g[3*var_id + a] = weight * EdgeMesh::get_gravity()[a];
+    g[3*var_id + a] = weight * edge_mesh->get_gravity()[a];
 }
 
 
@@ -75,7 +75,7 @@ void time_integral(double *const location, double *const speed, double time, dou
       cudaDeviceSynchronize();
 
       string out = "state_" + to_string(count) + ".vtk";
-      write_mesh_to_vtk(vert, edge_mesh, out.c_str());
+      write_mesh_to_vtk(vert, *edge_mesh, out.c_str());
     }
   }
   cudaFree(force);
@@ -88,7 +88,7 @@ void movement_integral(double *const location, double *const speed, double *cons
 
   if (integral == Integral::explicit_euler)
   {
-    calc_force(location, force);
+    calc_force(location, force, edge_mesh);
     explicit_integral<<<grid_size, block_size>>>
       (location, speed, force, delta_t, edge_mesh);
   }
@@ -98,7 +98,7 @@ void movement_integral(double *const location, double *const speed, double *cons
   }
   else if (integral == Integral::location_implicit)
   {
-    calc_force(location, force);
+    calc_force(location, force, edge_mesh);
     location_semi_implicit_integral<<<grid_size, block_size>>>
       (location, speed, force, delta_t,edge_mesh);
   }
@@ -116,7 +116,7 @@ __global__ void explicit_integral(double *const location, double *const speed, d
   if (vert_id == edge_mesh->fixed_vert)
     return ;
   double weight = edge_mesh->get_vert_weight(vert_id);
-  int var_id = vert_id > fixed_vert ? vert_id - 1 : vert_id;
+  int var_id = vert_id > edge_mesh->fixed_vert ? vert_id - 1 : vert_id;
   for (int a = 0; a < 3; ++a)
   {
     location[3*var_id + a] += speed[3*var_id + a] * delta_t;
@@ -131,7 +131,7 @@ __global__ void location_semi_implicit_integral(double *const location, double *
   if (vert_id == edge_mesh->fixed_vert)
     return ;
   double weight = edge_mesh->get_vert_weight(vert_id);
-  int var_id = vert_id > fixed_vert ? vert_id - 1 : vert_id;
+  int var_id = vert_id > edge_mesh->fixed_vert ? vert_id - 1 : vert_id;
   for (int a = 0; a < 3; ++a)
   {
     double acceleration = 1.0 / weight * force[3*var_id + a];
@@ -154,7 +154,7 @@ void speed_semi_implicit_integral(double *const location, double *const speed, d
       location[3*var_id + a] += speed[3*var_id + a] * delta_t;
   }
 
-  calc_force(location, force);
+  calc_force(location, force, edge_mesh);
   for (int i = 0; i < vert_num; ++i)
   {
     if (i == fixed_vert)
@@ -181,10 +181,27 @@ __global__ void init_var_and_speed(double *var, double *speed, EdgeMesh *edge_me
   if (vert_id == edge_mesh->fixed_vert)
     return ;
   const Vector3d &vert = edge_mesh->get_vert_coord(vert_id);
-  int var_id = vert_id > fixed_vert ? vert_id - 1 : vert_id;
+  int var_id = vert_id > edge_mesh->fixed_vert ? vert_id - 1 : vert_id;
   for (int j = 0; j < 3; ++j)
   {
     var[3*var_id + j] = vert[j];
     speed[3*var_id + j] = 0;
   } 
+}
+
+std::array<Vector3d, 2> get_edge_vert(const double* x, int vj, int vi, const EdgeMesh *const edge_mesh)
+{
+  array<int, 2> vert_id = {vj, vi};
+  array<Vector3d, 2> v;
+  for (int i = 0; i < 2; ++i)
+  {
+    if (vert_id[i] == edge_mesh->fixed_vert)
+      v[i] = edge_mesh->get_vert_coord(vert_id[i]);
+    else
+    {
+      int var_id = vert_id[i] > edge_mesh->fixed_vert ? vert_id[i] - 1 : vert_id[i];
+      v[i] << x[3 * var_id], x[3*var_id+1], x[3*var_id+2];
+    }
+  }
+  return v;
 }

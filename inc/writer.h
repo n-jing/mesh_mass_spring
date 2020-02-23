@@ -6,7 +6,7 @@
 class EdgeMesh;
 
 
-std::vector<double> get_vert(double *var, const EdgeMesh& edge_mesh);
+__global__ void update_vert(double *var,double *vert,const EdgeMesh *const edge_mesh);
 
 int write_mesh_to_vtk(double *var, const EdgeMesh &edge_mesh, const char *path);
 

@@ -9,8 +9,8 @@
 class EdgeMesh
 {
 public:
-  EdgeMesh(const Eigen::MatrixXd &V, const Eigen::MatrixXi &F);
-  EdgeMesh() { }
+  __device__ __host__ EdgeMesh(const Eigen::MatrixXd &V, const Eigen::MatrixXi &F);
+  __device__ __host__ EdgeMesh() { }
   struct Vert
   {
     Vert(const double *const vert, double weight)
@@ -29,37 +29,36 @@ public:
     std::array<size_t, 2> e;
     double k;
   };
-  static void set_gravity(const Eigen::Vector3d &g);
-  static Eigen::Vector3d &get_gravity();
+  __device__ __host__ void set_gravity(const Eigen::Vector3d &g);
+  __device__ __host__ const Eigen::Vector3d &get_gravity() const;
 
-  static void set_displacement(double d);
-  static double get_displacement();
+  __device__ __host__ void set_displacement(double d);
+  __device__ __host__ double get_displacement();
   int fixed_vert;
 public:
-  size_t get_vert_num() const;
-  size_t get_edge_num() const;
-  int init(const Eigen::MatrixXd &V, const Eigen::MatrixXi &F);
-  int init(const double *const V, int v_row, int v_col,
-           const double *const F, int f_row, int f_col);
+  __device__ __host__ size_t get_vert_num() const;
+  __device__ __host__ size_t get_edge_num() const;
+  __device__ __host__ int init(const double *const V, int v_row, int v_col,
+                               const int *const F, int f_row, int f_col);
 
 public:
-  size_t add_vert(const double *const v, int v_id = 0, double w = 0);
-  void add_edge(const std::array<size_t, 2> &e, int e_id = 0, double k = 0);
-  const std::array<size_t, 2> &get_edge(size_t idx) const;
-  double get_edge_length(size_t idx) const;
-  double get_edge_weight(size_t idx) const;
-  const Eigen::Vector3d &get_vert_coord(size_t idx) const;
-  double get_vert_weight(size_t idx) const;
+  __device__ __host__ size_t add_vert(const double *const v, int v_id = 0, double w = 0);
+  __device__ __host__ void add_edge(const std::array<size_t, 2> &e, int e_id = 0, double k = 0);
+  __device__ __host__ const std::array<size_t, 2> &get_edge(size_t idx) const;
+  __device__ __host__ double get_edge_length(size_t idx) const;
+  __device__ __host__ double get_edge_weight(size_t idx) const;
+  __device__ __host__ const Eigen::Vector3d &get_vert_coord(size_t idx) const;
+  __device__ __host__ double get_vert_weight(size_t idx) const;
 
-  void set_vert_weight(size_t idx, double w);
-  void set_edge_stiffness(size_t idx, double k);
+  __device__ __host__ void set_vert_weight(size_t idx, double w);
+  __device__ __host__ void set_edge_stiffness(size_t idx, double k);
   
 // private:
 public:
   Vert *vert_; // vert
   Edge *edge_;
-  static double d_; // default displacement
-  static Eigen::Vector3d gravity_;  // gravity
+  double d_; // default displacement
+  Eigen::Vector3d gravity_;  // gravity
 };
 
 #endif // MESHH_JJ_H

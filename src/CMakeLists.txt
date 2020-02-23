@@ -10,23 +10,23 @@ SET(CUDA_PROPAGATE_HOST_FLAGS OFF)
 IF (CMAKE_SIZEOF_VOID_P MATCHES 8)
   SET(CUDA_64_BIT_DEVICE_CODE_DEFAULT ON)
 ENDIF()
+set(CUDA_NVCC_FLAGS "-w")
+
+
+# SET((nvcc_options disable-warning)
 
 # ADD_DEFINITIONS(-DRANDOM) #random vert weight and random k
 # ADD_DEFINITIONS(-DRIGID)  #rigid mesh
 
+CMAKE_POLICY(SET CMP0023 OLD)
 SET(src_mesh
-  solver.cpp
-  writer.cpp
-  mesh.cpp
+  writer.cu
+  mesh.cu
   time_integral.cu
   remove_duplicate_vert.cpp)
 CUDA_ADD_LIBRARY(mesh ${src_mesh})
 TARGET_INCLUDE_DIRECTORIES(mesh PUBLIC ${CMAKE_SOURCE_DIR}/inc ${CUDA_INCLUDE_DIRS})
-TARGET_LINK_LIBRARIES(mesh PUBLIC Eigen3::Eigen igl::core bfgs ${CUDA_LIBS})
-
-
-ADD_EXECUTABLE(balance balance.cpp)
-TARGET_LINK_LIBRARIES(balance mesh)
+TARGET_LINK_LIBRARIES(mesh PUBLIC Eigen3::Eigen igl::core bfgs  ${CUDA_LIBRARIES})
 
 CUDA_ADD_EXECUTABLE(dynamic dynamic.cu)
 TARGET_LINK_LIBRARIES(dynamic mesh)

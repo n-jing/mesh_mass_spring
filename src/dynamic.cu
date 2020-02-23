@@ -33,9 +33,9 @@ int main (int argc, char *argv[])
   cudaMallocManaged((void**)&edge_mesh->edge_, 3*F.rows()*sizeof(EdgeMesh::Edge));
 
   for (int i = 0; i < V.size(); ++i)
-    v[i] = V[i];
+    v[i] = V(i);
   for (int i = 0; i < F.size(); ++i)
-    f[i] = F[i];
+    f[i] = F(i);
 
   edge_mesh->init(v, V.rows(), V.cols(), f, F.rows(), F.cols());
   cerr << edge_mesh->get_vert_num() << " " << edge_mesh->get_edge_num() << endl;
@@ -62,16 +62,17 @@ int main (int argc, char *argv[])
   dim3 grid_size((edge_mesh->get_vert_num() + block_size.x - 1) / block_size.x);
   init_var_and_speed<<<grid_size, block_size>>>(var, speed, edge_mesh);
 
-  get_vert(var, vert, edge_mesh);
+  
+  update_vert<<<grid_size, block_size>>>(var, vert, edge_mesh);
   cudaDeviceSynchronize();
-  write_mesh_to_vtk(&init_edge_vert[0], edge_mesh, "init_state.vtk");
+  write_mesh_to_vtk(vert, *edge_mesh, "init_state.vtk");
   
   Integral integral = Integral::location_implicit;
   time_integral(var, speed, time, delta_t, integral, edge_mesh, vert);
   
-  get_vert(var, vert, edge_mesh);
+  update_vert<<<grid_size, block_size>>>(var, vert, edge_mesh);
   cudaDeviceSynchronize();
-  write_mesh_to_vtk(&balance_edge_vert[0], edge_mesh, "final_state.vtk");
+  write_mesh_to_vtk(vert, *edge_mesh, "final_state.vtk");
 
   cudaFree(v);
   cudaFree(f);
