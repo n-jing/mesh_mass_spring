@@ -19,6 +19,8 @@ __device__ __host__ EdgeMesh::EdgeMesh(const Eigen::MatrixXd &V, const Eigen::Ma
 {
   d_ = 0.1;
   gravity_ = {0, -9.8, 0};
+  vert_num = V.rows();
+  edge_num = F.rows() * 3;
 
   init(&V(0), V.rows(), V.cols(), &F(0), F.rows(), F.cols());
 }
@@ -28,8 +30,16 @@ __device__ __host__ int EdgeMesh::init(
   const double *const V, int v_row, int v_col,
   const int *const F, int f_row, int f_col)
 {
+  d_ = 0.1;
+  gravity_ = {0, -9.8, 0};
+  vert_num = v_row;
+  edge_num = f_row * 3;
+
   for (size_t i = 0; i < v_row; ++i)
-    add_vert(&V[i], i);
+  {
+    Vector3d vert = {V[i], V[i + v_row], V[i + 2*v_row]};
+    add_vert(vert, i);
+  } 
 
   int e_id = 0;
   double min_e = numeric_limits<double>::max();
@@ -37,9 +47,11 @@ __device__ __host__ int EdgeMesh::init(
   {
     for (size_t j = 0; j < f_col; ++j)
     {
-      array<size_t, 2> e = {F[i, i + f_row * j],
-                            F[i, i + f_row * (j+1) % f_col]};
-      add_edge(e, e_id++);
+      array<int, 2> f_v = {i+f_row*j, i+f_row*((j+1)%f_col)};
+      array<size_t, 2> e = {F[f_v[0]], F[f_v[1]]};
+      add_edge(e, e_id);
+      ++e_id;
+      e = {0, 3};
       min_e = min((vert_[e[0]].v - vert_[e[1]].v).norm(), min_e);
     }
   }
@@ -54,7 +66,8 @@ __device__ __host__ int EdgeMesh::init(
     set_vert_weight(i, 1);
 #endif
   }
-  const size_t edge_num = sizeof(edge_) / sizeof(Edge);
+
+  const size_t edge_num = get_edge_num();
   for (size_t i = 0; i < edge_num; ++i)
   {
     // m * g = k * delta x = k * d * x
@@ -79,27 +92,27 @@ __device__ __host__ void EdgeMesh::set_gravity(const Eigen::Vector3d &g)
 
 __device__ __host__ size_t EdgeMesh::get_vert_num() const
 {
-  return sizeof(vert_) / sizeof(Vert);
+  return vert_num;
 }
 
 __device__ __host__ size_t EdgeMesh::get_edge_num() const
 {
-  return sizeof(edge_) / sizeof(Edge);
+  return edge_num;
 }
 
 __device__ __host__ void EdgeMesh::set_vert_weight(size_t idx, double w)
 {
-  assert(idx < sizeof(vert_) / sizeof(Edge));
+  assert(idx < vert_num);
   vert_[idx].w = w;
 }
 
 __device__ __host__ void EdgeMesh::set_edge_stiffness(size_t idx, double k)
 {
-  assert(idx < sizeof(edge_) / sizeof(Edge));
+  assert(idx < edge_num);
   edge_[idx].k = k;
 }
 
-__device__ __host__ size_t EdgeMesh::add_vert(const double *const v, int v_id, double w)
+__device__ __host__ size_t EdgeMesh::add_vert(const Eigen::Vector3d &v, int v_id, double w)
 {
   EdgeMesh::Vert vert(v, w);
   vert.id = v_id;

@@ -5,6 +5,8 @@
 #include <Eigen/Core>
 #include <unordered_map>
 #include <array>
+#include <cuda.h>
+#include <cuda_runtime.h>
 
 class EdgeMesh
 {
@@ -13,11 +15,7 @@ public:
   __device__ __host__ EdgeMesh() { }
   struct Vert
   {
-    Vert(const double *const vert, double weight)
-      {
-        v[0] = vert[0]; v[1] = vert[1]; v[2] = vert[2];
-        w = weight;
-      }
+    Vert(const Eigen::Vector3d &vert, double weight) : v(vert), w(weight) { }
     size_t id;
     Eigen::Vector3d v;
     double w;
@@ -42,8 +40,8 @@ public:
                                const int *const F, int f_row, int f_col);
 
 public:
-  __device__ __host__ size_t add_vert(const double *const v, int v_id = 0, double w = 0);
-  __device__ __host__ void add_edge(const std::array<size_t, 2> &e, int e_id = 0, double k = 0);
+  __device__ __host__ size_t add_vert(const Eigen::Vector3d &vert, int v_id = 0, double w = 0);
+  __device__ __host__ void add_edge(const std::array<size_t, 2> &e, int e_id = 0, double k = 0.1);
   __device__ __host__ const std::array<size_t, 2> &get_edge(size_t idx) const;
   __device__ __host__ double get_edge_length(size_t idx) const;
   __device__ __host__ double get_edge_weight(size_t idx) const;
@@ -59,6 +57,8 @@ public:
   Edge *edge_;
   double d_; // default displacement
   Eigen::Vector3d gravity_;  // gravity
+  int vert_num;
+  int edge_num;
 };
 
 #endif // MESHH_JJ_H

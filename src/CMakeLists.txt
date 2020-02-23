@@ -20,7 +20,7 @@ set(CUDA_NVCC_FLAGS "-w")
 
 CMAKE_POLICY(SET CMP0023 OLD)
 SET(src_mesh
-  writer.cu
+  writer.cpp
   mesh.cu
   time_integral.cu
   remove_duplicate_vert.cpp)

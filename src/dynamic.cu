@@ -21,7 +21,11 @@ int main (int argc, char *argv[])
   MatrixXd V;
   MatrixXi F;
   readOBJ("mesh.obj", V, F);
-
+  if (F.cols() != 3)
+  {
+    cerr << "only triangle are supported" << endl;
+    return -1;
+  }
 
   double *v;
   int *f;
@@ -65,14 +69,14 @@ int main (int argc, char *argv[])
   
   update_vert<<<grid_size, block_size>>>(var, vert, edge_mesh);
   cudaDeviceSynchronize();
-  write_mesh_to_vtk(vert, *edge_mesh, "init_state.vtk");
+  write_mesh_to_vtk(vert, edge_mesh, "init_state.vtk");
   
   Integral integral = Integral::location_implicit;
   time_integral(var, speed, time, delta_t, integral, edge_mesh, vert);
   
   update_vert<<<grid_size, block_size>>>(var, vert, edge_mesh);
   cudaDeviceSynchronize();
-  write_mesh_to_vtk(vert, *edge_mesh, "final_state.vtk");
+  write_mesh_to_vtk(vert, edge_mesh, "final_state.vtk");
 
   cudaFree(v);
   cudaFree(f);

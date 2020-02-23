@@ -38,4 +38,7 @@ __global__ void init_var_and_speed(double *var, double *speed, EdgeMesh *edge_me
 
 std::array<Eigen::Vector3d, 2> get_edge_vert(const double* x, int vj, int vi, const EdgeMesh *const edge_mesh);
 
+__global__ void update_vert(double *var,double *vert,const EdgeMesh *const edge_mesh);
+
+
 #endif // TIME_INTEGRAL_JJ_H
