@@ -2,6 +2,7 @@
 #include "remove_duplicate_vert.h"
 #include "solver.h"
 #include "writer.h"
+#include "write_to_file.h"
 #include "time_integral.h"
 #include <iostream>
 #include <igl/readOBJ.h>
@@ -17,16 +18,20 @@ using namespace igl;
 
 int main (int argc, char *argv[])
 {
-  remove_duplicate_vert(argv[1], "mesh.obj");
+  string str(argv[1]);
   MatrixXd V;
   MatrixXi F;
-  readOBJ("mesh.obj", V, F);
-  if (F.cols() != 3)
+  if (str.rfind(".vtk") != string::npos)
   {
-    cerr << "only triangle are supported" << endl;
-    return -1;
+    tet_mesh_read_from_vtk(argv[1], V, F);
   }
-
+  else
+  {
+    remove_duplicate_vert(argv[1], "mesh.obj");
+    readOBJ("mesh.obj", V, F);
+  }
+  V.transposeInPlace();
+  F.transposeInPlace();
   double *v;
   int *f;
   EdgeMesh *edge_mesh;
@@ -45,7 +50,7 @@ int main (int argc, char *argv[])
 
   const int vert_num = edge_mesh->get_vert_num();
   const int var_num = 3 * (vert_num - 1);
-  const double time = 10;
+  const double time = 1;
   const double delta_t = 1e-3;
   
   random_device rd;
